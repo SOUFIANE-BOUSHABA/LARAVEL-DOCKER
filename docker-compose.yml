@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  nginx:
+    container_name: nginx
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    depends_on:
+      - app
+      - db
+    volumes:
+      - ./src:/var/www
+      - ./nginx/conf.d/:/etc/nginx/conf.d
+
+  db:
+    image: mysql
+    container_name: mysql
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+    ports:
+      - "3309:3306"
+    environment:
+      MYSQL_DATABASE: book
+      MYSQL_ROOT_PASSWORD: password
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin 
+    ports:
+      - "3400:80"
+    depends_on:
+      - db
+
+  app:
+    container_name: livecoding
+    build: 
+      context: ./php
+      dockerfile: Dockerfile
+    volumes:
+      - ./src:/var/www
+    ports:
+      - "9000:9000"
+    working_dir: /var/www
